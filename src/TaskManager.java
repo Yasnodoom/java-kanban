@@ -106,10 +106,6 @@ public class TaskManager {
         return new Epic(name, description, getNewID());
     }
 
-    public Epic createEpic(String name, String description, ArrayList<SubTask> subTasks) {
-        return new Epic(name, description, getNewID(), subTasks);
-    }
-
     public SubTask createSubTask(String name, String description, Epic epic) {
         SubTask subTask = new SubTask(name, description, getNewID(), epic);
         epic.addSubTask(subTask);
