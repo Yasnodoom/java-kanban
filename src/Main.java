@@ -1,36 +1,42 @@
-import manager.Status;
+import task.Status;
 import manager.TaskManager;
 import task.Epic;
-import task.Task;
 import task.SubTask;
+import task.Task;
 
 public class Main {
     public static void main(String[] args) {
         TaskManager taskManager = new TaskManager();
 
-        Task task = taskManager.createTask("task1", "desc");
-        Task task2 = taskManager.createTask("task2", "desc");
-        taskManager.setTasks(task);
-        taskManager.setTasks(task2);
+        Task task = new Task("task1", "desc", taskManager.getNewID());
+        Task task2 = new Task("task2", "desc", taskManager.getNewID());
+
+        taskManager.createTask(task);
+        taskManager.createTask(task2);
+
         task.setName("changed name");
         task.setStatus(Status.IN_PROGRESS);
-        taskManager.printTasks();
-        System.out.println("---");
         taskManager.updateTask(task);
         taskManager.deleteTaskByID(task2.getId());
 
-        Epic epic1 = taskManager.createEpic("Epic1", "desc");
-        Epic epic2 = taskManager.createEpic("Epic2", "desc");
-        taskManager.setEpics(epic1);
-        taskManager.setEpics(epic2);
+        Epic epic1 = new Epic("Epic1", "desc", taskManager.getNewID());
+        Epic epic2 = new Epic("Epic2", "desc", taskManager.getNewID());
 
-        SubTask subTask = taskManager.createSubTask("subTaskDone", "desc", epic2.getId());
+        taskManager.createEpic(epic1);
+        taskManager.createEpic(epic2);
+
+        SubTask subTask = new SubTask("subTaskDone", "desc", taskManager.getNewID(), epic2.getId());
+        SubTask subTask2 = new SubTask("subTask2", "desc", taskManager.getNewID(), epic2.getId());
+
+        taskManager.createSubTask(subTask);
+        taskManager.createSubTask(subTask2);
         subTask.setStatus(Status.DONE);
+        subTask2.setStatus(Status.DONE);
+
         taskManager.updateSubTask(subTask);
-        taskManager.setSubTasks(taskManager.createSubTask("sub1", "desc", epic1.getId()));
-        taskManager.setSubTasks(taskManager.createSubTask("sub2", "desc", epic1.getId()));
-        taskManager.setSubTasks(subTask);
-        taskManager.printAllTasks();
+
+        taskManager.getSubTaskByEpic(epic2);
+        taskManager.deleteSubTasks();
 
     }
 }

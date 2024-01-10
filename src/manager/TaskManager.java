@@ -1,10 +1,11 @@
 package manager;
 
 import task.Epic;
+import task.Status;
 import task.SubTask;
 import task.Task;
 
-import java.util.HashMap;
+import java.util.*;
 
 public class TaskManager {
 
@@ -13,30 +14,6 @@ public class TaskManager {
     private final HashMap<Integer, Task> tasks = new HashMap<>();
     private final HashMap<Integer, Epic> epics = new HashMap<>();
     private final HashMap<Integer, SubTask> subTasks = new HashMap<>();
-
-    public void printTasks() {
-        for (Integer id : tasks.keySet()) {
-            System.out.println(tasks.get(id));
-        }
-    }
-
-    public void printEpics() {
-        for (Integer id : epics.keySet()) {
-            System.out.println(epics.get(id));
-        }
-    }
-
-    public void printSubTasks() {
-        for (Integer id : subTasks.keySet()) {
-            System.out.println(subTasks.get(id));
-        }
-    }
-
-    public void printAllTasks() {
-        printTasks();
-        printEpics();
-        printSubTasks();
-    }
 
     public Task getTaskByID(Integer taskID) {
         return tasks.getOrDefault(taskID, null);
@@ -56,10 +33,14 @@ public class TaskManager {
 
     public void deleteEpics() {
         epics.clear();
+        subTasks.clear();
     }
 
     public void deleteSubTasks() {
-        subTasks.clear();
+        Set<Integer> IDs = new HashSet<>(subTasks.keySet());
+        for (Integer id : IDs) {
+            deleteSubTaskByID(id);
+        }
     }
 
     public void updateTask(Task task) {
@@ -75,20 +56,17 @@ public class TaskManager {
         autoUpdateEpicStatus(task.getEpicID());
     }
 
-    public Task createTask(String name, String description) {
-        return new Task(name, description, getNewID());
+    public void createTask(Task task) {
+        tasks.put(task.getId(), task);
     }
 
-    public Epic createEpic(String name, String description) {
-        return new Epic(name, description, getNewID());
+    public void createEpic(Epic epic) {
+        epics.put(epic.getId(), epic);
     }
 
-    public SubTask createSubTask(String name, String description, Integer epicID) {
-        int id = getNewID();
-
-        SubTask subTask = new SubTask(name, description, id, epicID);
-        epics.get(epicID).setSubTaskID(id);
-        return subTask;
+    public void createSubTask(SubTask subTask) {
+        epics.get(subTask.getEpicID()).setSubTaskID(subTask.getId());
+        subTasks.put(subTask.getId(), subTask);
     }
 
     public void deleteTaskByID(Integer id) {
@@ -100,7 +78,11 @@ public class TaskManager {
     }
 
     public void deleteSubTaskByID(Integer id) {
+        int epicID = subTasks.get(id).getEpicID();
+
+        epics.get(epicID).getSubTaskIDs().remove(id);
         subTasks.remove(id);
+        autoUpdateEpicStatus(epicID);
     }
 
     public HashMap<Integer, SubTask> getSubTaskByEpic(Epic epic) {
@@ -112,7 +94,7 @@ public class TaskManager {
         return subTaskByEpic;
     }
 
-    private Integer getNewID() {
+    public Integer getNewID() {
         return idCounter++;
     }
 
@@ -164,15 +146,4 @@ public class TaskManager {
         return subTasks;
     }
 
-    public void setTasks(Task task) {
-        tasks.put(task.getId(), task);
-    }
-
-    public void setEpics(Epic epic) {
-        epics.put(epic.getId(), epic);
-    }
-
-    public void setSubTasks(SubTask subTask) {
-        subTasks.put(subTask.getId(), subTask);
-    }
 }
