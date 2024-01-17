@@ -1,12 +1,12 @@
-import task.Status;
-import manager.TaskManager;
+import manager.InMemoryTaskManager;
 import task.Epic;
+import task.Status;
 import task.SubTask;
 import task.Task;
 
 public class Main {
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
+        InMemoryTaskManager taskManager = new InMemoryTaskManager();
 
         Task task = new Task("task1", "desc", taskManager.getNewID());
         Task task2 = new Task("task2", "desc", taskManager.getNewID());
