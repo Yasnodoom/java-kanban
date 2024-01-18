@@ -1,9 +1,14 @@
 package manager;
 
-public class Managers<T extends TaskManager> {
-    private T taskManager;
+public class Managers {
+    private static final InMemoryHistoryManager inMemoryHistoryManager = new InMemoryHistoryManager();
+    private static final InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
 
-    public T getDefault() {
-        return T;
+    public static TaskManager getDefault() {
+        return inMemoryTaskManager;
+    }
+
+    public static HistoryManager getDefaultHistory() {
+        return inMemoryHistoryManager;
     }
 }

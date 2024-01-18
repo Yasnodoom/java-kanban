@@ -26,11 +26,11 @@ public interface TaskManager {
 
     void updateSubTask(SubTask task);
 
-    void createTask(Task task);
+    void addTask(Task task);
 
-    void createEpic(Epic epic);
+    void addEpic(Epic epic);
 
-    void createSubTask(SubTask subTask);
+    void addSubTask(SubTask subTask);
 
     void deleteTaskByID(Integer id);
 
@@ -45,6 +45,8 @@ public interface TaskManager {
     HashMap<Integer, Epic> getEpics();
 
     HashMap<Integer, SubTask> getSubTasks();
+
+    Integer getNewId();
 
     List<Task> getHistory();
 }
