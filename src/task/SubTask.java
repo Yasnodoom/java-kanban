@@ -1,7 +1,7 @@
 package task;
 
 public class SubTask extends Task {
-    private final Integer epicID;
+    private Integer epicID;
 
     public SubTask(String name, String description, Integer id, Integer epicID) {
         super(name, description, id);
