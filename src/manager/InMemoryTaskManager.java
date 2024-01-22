@@ -5,10 +5,7 @@ import task.Status;
 import task.SubTask;
 import task.Task;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     private int idCounter = 0;
@@ -73,16 +70,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void addTask(Task task) {
+        task.setId(getNewId());
         tasks.put(task.getId(), task);
     }
 
     @Override
     public void addEpic(Epic epic) {
+        epic.setId(getNewId());
         epics.put(epic.getId(), epic);
     }
 
     @Override
     public void addSubTask(SubTask subTask) {
+        subTask.setId(getNewId());
         epics.get(subTask.getEpicID()).setSubTaskID(subTask.getId());
         subTasks.put(subTask.getId(), subTask);
     }
@@ -107,28 +107,28 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public HashMap<Integer, SubTask> getSubTaskByEpic(Epic epic) {
-        HashMap<Integer, SubTask> subTaskByEpic = new HashMap<>();
+    public ArrayList<SubTask> getSubTaskByEpic(Epic epic) {
+        ArrayList<SubTask> subTaskByEpic = new ArrayList<>();
 
         for (Integer id : epic.getSubTaskIDs()) {
-            subTaskByEpic.put(id, subTasks.get(id));
+            subTaskByEpic.add(subTasks.get(id));
         }
         return subTaskByEpic;
     }
 
     @Override
-    public HashMap<Integer, Task> getTasks() {
-        return tasks;
+    public ArrayList<Task> getTasks() {
+        return new ArrayList<>(this.tasks.values());
     }
 
     @Override
-    public HashMap<Integer, Epic> getEpics() {
-        return epics;
+    public ArrayList<Epic> getEpics() {
+        return new ArrayList<>(epics.values());
     }
 
     @Override
-    public HashMap<Integer, SubTask> getSubTasks() {
-        return subTasks;
+    public ArrayList<SubTask> getSubTasks() {
+        return new ArrayList<>(subTasks.values());
     }
 
     @Override
@@ -136,8 +136,7 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 
-    @Override
-    public Integer getNewId() {
+    private Integer getNewId() {
         return idCounter++;
     }
 
