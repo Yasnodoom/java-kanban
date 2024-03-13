@@ -1,6 +1,6 @@
 package manager;
 
-import exception.ManagerSaveException;
+import exception.ManagerLoadException;
 import task.*;
 
 import java.io.IOException;
@@ -108,7 +108,7 @@ public class CSVTaskFormatter {
             }
             fileBackedTaskManager.save();
         } catch (IOException e) {
-            throw new ManagerSaveException(e.getMessage());
+            throw new ManagerLoadException(e.toString());
         }
         return fileBackedTaskManager;
     }

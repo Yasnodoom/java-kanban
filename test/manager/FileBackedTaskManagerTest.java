@@ -1,5 +1,7 @@
 package manager;
 
+import exception.ManagerLoadException;
+import exception.ManagerSaveException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import task.Epic;
@@ -78,5 +80,31 @@ public class FileBackedTaskManagerTest {
         assertEquals(fileBackedTaskManager.getEpicByID(3).getStatus(), Status.DONE);
         assertEquals(fileBackedTaskManager.getSubTaskByID(4).getEpicID(), 3);
     }
+
+    @Test
+    public void backManagerLoadFromNotExistFileShouldThrowsException() {
+        assertThrows(ManagerLoadException.class, () -> CSVTaskFormatter.loadFromFile(Path.of("notExist")));
+    }
+
+    private static class MyManager extends FileBackedTaskManager {
+        public MyManager(Path file) {
+            super(file);
+        }
+
+        @Override
+        public void save() {
+            try {
+                throw new IOException("this is test");
+            } catch (IOException e) {
+                throw new ManagerSaveException(e.toString());
+            }
+        }
+    }
+
+    @Test
+    public void backManagerSaveWithException() {
+        assertThrows(ManagerSaveException.class, () -> new MyManager(Files.createTempFile("test", "csv")).save());
+    }
+
 
 }
