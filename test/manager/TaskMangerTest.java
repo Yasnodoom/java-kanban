@@ -15,7 +15,7 @@ public class TaskMangerTest {
     private TaskManager taskManager;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         taskManager = Managers.getDefault();
     }
 
@@ -62,7 +62,7 @@ public class TaskMangerTest {
     }
 
     @Test
-    void addNewTask() {
+    public void addNewTask() {
         Task task = new Task("Test addNewTask", "Test addNewTask description");
         taskManager.addTask(task);
         final int taskId = task.getId();
@@ -79,7 +79,7 @@ public class TaskMangerTest {
     }
 
     @Test
-    void taskEqualsIfIdEquals() {
+    public void taskEqualsIfIdEquals() {
         Task task = new Task("task", "desc");
         taskManager.addTask(task);
         int id = task.getId();
@@ -87,7 +87,7 @@ public class TaskMangerTest {
     }
 
     @Test
-    void epicEqualsIfIdEquals() {
+    public void epicEqualsIfIdEquals() {
         Epic task = new Epic("epic", "desc");
         taskManager.addEpic(task);
         int id = task.getId();
@@ -95,7 +95,7 @@ public class TaskMangerTest {
     }
 
     @Test
-    void subTaskEqualsIfIdEquals() {
+    public void subTaskEqualsIfIdEquals() {
         Epic epic = new Epic("epic", "desc");
         taskManager.addEpic(epic);
         SubTask task = new SubTask("subTask", "desc", epic.getId());
@@ -105,7 +105,7 @@ public class TaskMangerTest {
     }
 
     @Test
-    void errorIfEpicAddLikeSubTaskToHimself() {
+    public void errorIfEpicAddLikeSubTaskToHimself() {
         Epic epic = new Epic("epic", "desc");
         taskManager.addEpic(epic);
         epic.setSubTaskID(epic.getId());
@@ -113,7 +113,7 @@ public class TaskMangerTest {
     }
 
     @Test
-    void errorIfSubTaskIsEpicToHimself() {
+    public void errorIfSubTaskIsEpicToHimself() {
         Epic epic = new Epic("epic", "desc");
         taskManager.addEpic(epic);
         int epicId = taskManager.getEpics().getLast().getId();
@@ -128,14 +128,14 @@ public class TaskMangerTest {
     }
 
     @Test
-    void searchById() {
+    public void searchById() {
         Epic epic = new Epic("epic", "desc");
         taskManager.addEpic(epic);
         assertNotNull(taskManager.getEpicByID(epic.getId()));
     }
 
     @Test
-    void conflictIfHardId(){
+    public void conflictIfHardId(){
         Epic epic = new Epic("epic", "desc");
         taskManager.addEpic(epic);
         Epic epic2 = new Epic("epic2", "desc");

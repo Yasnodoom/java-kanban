@@ -19,20 +19,20 @@ public class FileBackedTaskManagerTest {
     private static final Path withData = Path.of("test", "resources", "withData.csv");
 
     @Test
-    void backManagerLoadEmptyFile() {
+    public void backManagerLoadEmptyFile() {
         FileBackedTaskManager emptyManager = Managers.getFileBackedTaskManager(empty);
         assertNotNull(emptyManager);
     }
 
     @Test
-    void backManagerSaveEmptyFile() throws IOException {
+    public void backManagerSaveEmptyFile() throws IOException {
         FileBackedTaskManager emptyManager = Managers.getFileBackedTaskManager(empty);
         emptyManager.save();
         assertTrue(Files.readString(empty).isEmpty());
     }
 
     @Test
-    void backManagerSaveTaskToFile() throws IOException {
+    public void backManagerSaveTaskToFile() throws IOException {
         FileBackedTaskManager fileBackedTaskManager = Managers.getFileBackedTaskManager(forWriteData);
 
         Task task1 = new Task("task1", "desc");
@@ -70,13 +70,13 @@ public class FileBackedTaskManagerTest {
     }
 
     @Test
-    void backManagerLoadFromFile() {
+    public void backManagerLoadFromFile() {
         FileBackedTaskManager fileBackedTaskManager = CSVTaskFormatter.loadFromFile(withData);
         assertNotNull(fileBackedTaskManager);
-//        assertEquals(fileBackedTaskManager.getHistory().size(), 3);
-//        assertEquals(fileBackedTaskManager.getTaskByID(0).getName(), "changed name");
-//        assertEquals(fileBackedTaskManager.getEpicByID(3).getStatus(), Status.DONE);
-//        assertEquals(fileBackedTaskManager.getSubTaskByID(4).getEpicID(), 3);
+        assertEquals(fileBackedTaskManager.getHistory().size(), 3);
+        assertEquals(fileBackedTaskManager.getTaskByID(0).getName(), "changed name");
+        assertEquals(fileBackedTaskManager.getEpicByID(3).getStatus(), Status.DONE);
+        assertEquals(fileBackedTaskManager.getSubTaskByID(4).getEpicID(), 3);
     }
 
 }

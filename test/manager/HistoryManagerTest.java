@@ -14,13 +14,13 @@ public class HistoryManagerTest {
     private TaskManager taskManager;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         historyManager = Managers.getDefaultHistory();
         taskManager = Managers.getDefault();
     }
 
     @Test
-    void add() {
+    public void add() {
         Task task1 = new Task("task1", "desc");
         historyManager.add(task1);
         final List<Task> history = historyManager.getHistory();
@@ -29,7 +29,7 @@ public class HistoryManagerTest {
     }
 
     @Test
-    void save12Elements() {
+    public void save12Elements() {
         for (int i = 0; i < 12; i++) {
             Task task = new Task("task" + i, "desc");
             taskManager.addTask(task);
@@ -41,7 +41,7 @@ public class HistoryManagerTest {
     }
 
     @Test
-    void savePrevisionVersion() {
+    public void savePrevisionVersion() {
         Task task = new Task("task", "desc");
         taskManager.addTask(task);
         historyManager.add(task);
@@ -52,7 +52,7 @@ public class HistoryManagerTest {
     }
 
     @Test
-    void saveOneTaskTwoTimesInHistoryManager() {
+    public void saveOneTaskTwoTimesInHistoryManager() {
         Task firstTask = new Task("firstTask", "firstTask");
         Task secondTask = new Task("secondTask", "secondTask");
         taskManager.addTask(firstTask);
