@@ -13,7 +13,7 @@ public class SubTask extends Task {
     }
 
     public void setEpicID(Integer epicID) {
-        if (this.epicID.equals(epicID)) return;
+        if (this.getId().equals(epicID)) return;
         this.epicID = epicID;
     }
 

@@ -1,5 +1,6 @@
 package manager;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task.Epic;
 import task.Status;
@@ -11,7 +12,12 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TaskMangerTest {
-    private static final TaskManager taskManager = Managers.getDefault();
+    private TaskManager taskManager;
+
+    @BeforeEach
+    public void setUp() {
+        taskManager = Managers.getDefault();
+    }
 
     @Test
     public void testTaskManager() {
@@ -56,11 +62,10 @@ public class TaskMangerTest {
     }
 
     @Test
-    void addNewTask() {
+    public void addNewTask() {
         Task task = new Task("Test addNewTask", "Test addNewTask description");
         taskManager.addTask(task);
         final int taskId = task.getId();
-
         final Task savedTask = taskManager.getTaskByID(taskId);
 
         assertNotNull(savedTask, "Задача не найдена.");
@@ -74,7 +79,7 @@ public class TaskMangerTest {
     }
 
     @Test
-    void taskEqualsIfIdEquals() {
+    public void taskEqualsIfIdEquals() {
         Task task = new Task("task", "desc");
         taskManager.addTask(task);
         int id = task.getId();
@@ -82,7 +87,7 @@ public class TaskMangerTest {
     }
 
     @Test
-    void epicEqualsIfIdEquals() {
+    public void epicEqualsIfIdEquals() {
         Epic task = new Epic("epic", "desc");
         taskManager.addEpic(task);
         int id = task.getId();
@@ -90,7 +95,7 @@ public class TaskMangerTest {
     }
 
     @Test
-    void subTaskEqualsIfIdEquals() {
+    public void subTaskEqualsIfIdEquals() {
         Epic epic = new Epic("epic", "desc");
         taskManager.addEpic(epic);
         SubTask task = new SubTask("subTask", "desc", epic.getId());
@@ -100,7 +105,7 @@ public class TaskMangerTest {
     }
 
     @Test
-    void errorIfEpicAddLikeSubTaskToHimself() {
+    public void errorIfEpicAddLikeSubTaskToHimself() {
         Epic epic = new Epic("epic", "desc");
         taskManager.addEpic(epic);
         epic.setSubTaskID(epic.getId());
@@ -108,32 +113,37 @@ public class TaskMangerTest {
     }
 
     @Test
-    void errorIfSubTaskIsEpicToHimself() {
+    public void errorIfSubTaskIsEpicToHimself() {
         Epic epic = new Epic("epic", "desc");
         taskManager.addEpic(epic);
-        SubTask subtask = new SubTask("subTask", "desc", epic.getId());
+        int epicId = taskManager.getEpics().getLast().getId();
+        SubTask subtask = new SubTask("subTask", "desc", epicId);
         taskManager.addSubTask(subtask);
-        int id = subtask.getId();
-        subtask.setEpicID(id);
-        assertNotEquals(subtask.getEpicID(), id);
+
+        int subTaskId = taskManager.getSubTasks().getLast().getId();
+        subtask.setEpicID(subTaskId);
+        taskManager.updateSubTask(subtask);
+
+        assertNotEquals(subtask.getEpicID(), subTaskId);
     }
 
     @Test
-    void searchById() {
+    public void searchById() {
         Epic epic = new Epic("epic", "desc");
         taskManager.addEpic(epic);
         assertNotNull(taskManager.getEpicByID(epic.getId()));
     }
 
     @Test
-    void noConflictIfHardId(){
+    public void conflictIfHardId(){
         Epic epic = new Epic("epic", "desc");
         taskManager.addEpic(epic);
         Epic epic2 = new Epic("epic2", "desc");
         epic2.setId(999);
         taskManager.addEpic(epic2);
+        taskManager.updateEpic(epic2);
         assertEquals(taskManager.getEpics().size(), 2);
-        assertNotNull(taskManager.getEpicByID(999));
+        assertNull(taskManager.getEpicByID(999));
         assertNotNull(taskManager.getEpicByID(epic.getId()));
     }
 
