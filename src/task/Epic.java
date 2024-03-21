@@ -1,7 +1,9 @@
 package task;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Epic extends Task {
@@ -10,7 +12,7 @@ public class Epic extends Task {
     private final List<Integer> timedSubTask = new ArrayList<>();
 
     public Epic(String name, String description) {
-        super(name, description);
+        super(name, description, Duration.ZERO, null);
     }
 
     public ArrayList<Integer> getSubTaskIDs() {
@@ -19,6 +21,23 @@ public class Epic extends Task {
 
     public List<Integer> getTimedSubTask() {
         return timedSubTask;
+    }
+
+
+    public String subtaskIDsToString() {
+        final Iterator<Integer> it = subTaskIDs.iterator();
+        if (! it.hasNext())
+            return "[]";
+
+        StringBuilder sb = new StringBuilder();
+        sb.append('[');
+        for (;;) {
+            int id = it.next();
+            sb.append(id);
+            if (! it.hasNext())
+                return sb.append(']').toString();
+            sb.append(' ');
+        }
     }
 
     public void setSubTaskID(Integer subTaskID) {

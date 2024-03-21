@@ -6,23 +6,29 @@ import task.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CSVTaskFormatter {
     static public String toString(Task task) {
         return switch (task.getClass().getName().split("\\.")[1]) {
-            case "Task" -> String.format("%d,%S,%s,%s,%s\n", task.getId(), "Task", task.getName(),
-                    task.getStatus(), task.getDescription());
+            case "Task" -> String.format("%d,%S,%s,%s,%s,%d,%s\n",
+                    task.getId(), "Task", task.getName(), task.getStatus(), task.getDescription(),
+                    task.getDuration().getSeconds(), task.getStartTime());
             case "Epic" -> {
                 Epic epic = (Epic) task;
-                yield String.format("%d,%S,%s,%s,%s,%s\n", epic.getId(), "Epic", epic.getName(),
-                        epic.getStatus(), epic.getDescription(), epic.getSubTaskIDs());
+                yield String.format("%d,%S,%s,%s,%s,%s,%d,%s,%s\n", epic.getId(), "Epic",
+                        epic.getName(), epic.getStatus(), epic.getDescription(), epic.subtaskIDsToString(),
+                        epic.getDuration().getSeconds(), epic.getStartTime(),
+                        epic.getEndTime());
             }
             case "SubTask" -> {
                 SubTask subTask = (SubTask) task;
-                yield String.format("%d,%S,%s,%s,%s,%d\n", subTask.getId(), "SubTask", subTask.getName(),
-                        subTask.getStatus(), subTask.getDescription(), subTask.getEpicID());
+                yield String.format("%d,%S,%s,%s,%s,%d,%d,%s\n", subTask.getId(), "SubTask",
+                        subTask.getName(), subTask.getStatus(), subTask.getDescription(), subTask.getEpicID(),
+                        subTask.getDuration().getSeconds(), subTask.getStartTime());
             }
             default -> null;
         };
@@ -33,7 +39,10 @@ public class CSVTaskFormatter {
 
         switch (TypeTask.valueOf(task[1])) {
             case TASK -> {
-                Task task0 = new Task(task[2], task[4]);
+                Task task0 = new Task(
+                        task[2], task[4], Duration.ofSeconds(Long.parseLong(task[5])),
+                        LocalDateTime.parse(task[6])
+                );
                 task0.setId(Integer.valueOf(task[0]));
                 task0.setStatus(Status.valueOf(task[3]));
                 return task0;
@@ -42,10 +51,19 @@ public class CSVTaskFormatter {
                 Epic epic = new Epic(task[2], task[4]);
                 epic.setId(Integer.valueOf(task[0]));
                 epic.setStatus(Status.valueOf(task[3]));
+                epic.setDuration(Duration.ofSeconds(Long.parseLong(task[6])));
+                if (! task[7].equals("null"))
+                    epic.setStartTime(LocalDateTime.parse(task[7]));
+
+                if (! task[8].equals("null"))
+                    epic.setEndTime(LocalDateTime.parse(task[8]));
                 return epic;
             }
             case SUBTASK -> {
-                SubTask subTask = new SubTask(task[2], task[4], Integer.valueOf(task[5]));
+                SubTask subTask = new SubTask(
+                        task[2], task[4], Integer.valueOf(task[5]), Duration.ofSeconds(Long.parseLong(task[6])),
+                        LocalDateTime.parse(task[7])
+                );
                 subTask.setId(Integer.valueOf(task[0]));
                 subTask.setStatus(Status.valueOf(task[3]));
                 return subTask;

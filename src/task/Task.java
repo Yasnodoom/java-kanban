@@ -21,14 +21,6 @@ public class Task implements Cloneable, Comparable<Task> {
         this.startTime = startTime;
     }
 
-    public Task(String name, String description) {
-        this.name = name;
-        this.description = description;
-        this.id = 0;
-        this.status = Status.NEW;
-    }
-
-
     public Integer getId() {
         return id;
     }

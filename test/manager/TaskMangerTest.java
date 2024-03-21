@@ -7,6 +7,8 @@ import task.Status;
 import task.SubTask;
 import task.Task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,8 +23,8 @@ public class TaskMangerTest {
 
     @Test
     public void testTaskManager() {
-        Task task1 = new Task("task1", "desc");
-        Task task2 = new Task("task2", "desc");
+        Task task1 = new Task("task1", "desc", Duration.ofSeconds(100), LocalDateTime.now());
+        Task task2 = new Task("task2", "desc", Duration.ofSeconds(200), LocalDateTime.now());
         taskManager.addTask(task1);
         taskManager.addTask(task2);
         task1.setName("changed name");
@@ -34,8 +36,12 @@ public class TaskMangerTest {
         taskManager.addEpic(epic1);
         taskManager.addEpic(epic2);
 
-        SubTask subTask = new SubTask("subTaskDone", "desc", epic2.getId());
-        SubTask subTask2 = new SubTask("subTask2", "desc", epic2.getId());
+        SubTask subTask = new SubTask(
+                "subTaskDone", "desc", epic2.getId(), Duration.ofSeconds(1000), LocalDateTime.now()
+        );
+        SubTask subTask2 = new SubTask(
+                "subTask2", "desc", epic2.getId(), Duration.ofSeconds(500), LocalDateTime.now()
+        );
         taskManager.addSubTask(subTask);
         taskManager.addSubTask(subTask2);
         subTask.setStatus(Status.DONE);
@@ -63,7 +69,9 @@ public class TaskMangerTest {
 
     @Test
     public void addNewTask() {
-        Task task = new Task("Test addNewTask", "Test addNewTask description");
+        Task task = new Task(
+                "Test addNewTask", "Test addNewTask description", Duration.ofSeconds(700), LocalDateTime.now()
+        );
         taskManager.addTask(task);
         final int taskId = task.getId();
         final Task savedTask = taskManager.getTaskByID(taskId);
@@ -80,7 +88,7 @@ public class TaskMangerTest {
 
     @Test
     public void taskEqualsIfIdEquals() {
-        Task task = new Task("task", "desc");
+        Task task = new Task("task", "desc", Duration.ofSeconds(100), LocalDateTime.now());
         taskManager.addTask(task);
         int id = task.getId();
         assertEquals(taskManager.getTaskByID(id), taskManager.getTaskByID(id));
@@ -98,7 +106,7 @@ public class TaskMangerTest {
     public void subTaskEqualsIfIdEquals() {
         Epic epic = new Epic("epic", "desc");
         taskManager.addEpic(epic);
-        SubTask task = new SubTask("subTask", "desc", epic.getId());
+        SubTask task = new SubTask("subTask", "desc", epic.getId(), Duration.ofSeconds(100), LocalDateTime.now());
         taskManager.addSubTask(task);
         int id = task.getId();
         assertEquals(taskManager.getTaskByID(id), taskManager.getTaskByID(id));
@@ -117,7 +125,7 @@ public class TaskMangerTest {
         Epic epic = new Epic("epic", "desc");
         taskManager.addEpic(epic);
         int epicId = taskManager.getEpics().getLast().getId();
-        SubTask subtask = new SubTask("subTask", "desc", epicId);
+        SubTask subtask = new SubTask("subTask", "desc", epicId, Duration.ofSeconds(100), LocalDateTime.now());
         taskManager.addSubTask(subtask);
 
         int subTaskId = taskManager.getSubTasks().getLast().getId();
@@ -135,7 +143,7 @@ public class TaskMangerTest {
     }
 
     @Test
-    public void conflictIfHardId(){
+    public void conflictIfHardId() {
         Epic epic = new Epic("epic", "desc");
         taskManager.addEpic(epic);
         Epic epic2 = new Epic("epic2", "desc");

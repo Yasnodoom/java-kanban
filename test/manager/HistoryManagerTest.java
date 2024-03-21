@@ -4,7 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task.Task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -12,16 +15,21 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class HistoryManagerTest {
     private HistoryManager historyManager;
     private TaskManager taskManager;
+    private Map<String, Task> tasks;
 
     @BeforeEach
     public void setUp() {
         historyManager = Managers.getDefaultHistory();
         taskManager = Managers.getDefault();
+//        tasks = Map.of(
+//                "Task1", new Task("task1", "desc", Duration.ofSeconds(100), LocalDateTime.now()),
+//
+//                        );
     }
 
     @Test
     public void add() {
-        Task task1 = new Task("task1", "desc");
+        Task task1 = new Task("task1", "desc", Duration.ofSeconds(100), LocalDateTime.now());
         historyManager.add(task1);
         final List<Task> history = historyManager.getHistory();
         assertNotNull(history, "История не пустая.");
@@ -31,7 +39,7 @@ public class HistoryManagerTest {
     @Test
     public void save12Elements() {
         for (int i = 0; i < 12; i++) {
-            Task task = new Task("task" + i, "desc");
+            Task task = new Task("task" + i, "desc", Duration.ofSeconds(100), LocalDateTime.now());
             taskManager.addTask(task);
             historyManager.add(task);
         }
@@ -42,7 +50,7 @@ public class HistoryManagerTest {
 
     @Test
     public void savePrevisionVersion() {
-        Task task = new Task("task", "desc");
+        Task task = new Task("task", "desc", Duration.ofSeconds(100), LocalDateTime.now());
         taskManager.addTask(task);
         historyManager.add(task);
         task.setDescription("changed");
@@ -53,8 +61,8 @@ public class HistoryManagerTest {
 
     @Test
     public void saveOneTaskTwoTimesInHistoryManager() {
-        Task firstTask = new Task("firstTask", "firstTask");
-        Task secondTask = new Task("secondTask", "secondTask");
+        Task firstTask = new Task("firstTask", "firstTask", Duration.ofSeconds(100), LocalDateTime.now());
+        Task secondTask = new Task("secondTask", "secondTask", Duration.ofSeconds(100), LocalDateTime.now());
         taskManager.addTask(firstTask);
         taskManager.addTask(secondTask);
         historyManager.add(firstTask);
