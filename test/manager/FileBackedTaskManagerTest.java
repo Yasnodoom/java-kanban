@@ -39,8 +39,8 @@ public class FileBackedTaskManagerTest {
     public void backManagerSaveTaskToFile() throws IOException {
         FileBackedTaskManager fileBackedTaskManager = Managers.getFileBackedTaskManager(forWriteData);
 
-        Task task1 = new Task("task1", "desc", Duration.ofSeconds(100), LocalDateTime.now());
-        Task task2 = new Task("task2", "desc", Duration.ofSeconds(100), LocalDateTime.now());
+        Task task1 = new Task("task1", "desc", Duration.ofSeconds(10), LocalDateTime.now().plusMinutes(1));
+        Task task2 = new Task("task2", "desc", Duration.ofSeconds(10), LocalDateTime.now().plusMinutes(2));
         fileBackedTaskManager.addTask(task1);
         fileBackedTaskManager.addTask(task2);
         task1.setName("changed name");
@@ -50,8 +50,10 @@ public class FileBackedTaskManagerTest {
         Epic epic2 = new Epic("Epic2", "desc");
         fileBackedTaskManager.addEpic(epic1);
         fileBackedTaskManager.addEpic(epic2);
-        SubTask subTask = new SubTask("subTaskDone", "desc", epic2.getId(), Duration.ofSeconds(100), LocalDateTime.now());
-        SubTask subTask2 = new SubTask("subTask2", "desc", epic2.getId(), Duration.ofSeconds(100), LocalDateTime.now());
+        SubTask subTask = new SubTask("subTaskDone", "desc", epic2.getId(),
+                Duration.ofSeconds(10), LocalDateTime.now().plusMinutes(3));
+        SubTask subTask2 = new SubTask("subTask2", "desc", epic2.getId(),
+                Duration.ofSeconds(10), LocalDateTime.now().plusMinutes(4));
         fileBackedTaskManager.addSubTask(subTask);
         fileBackedTaskManager.addSubTask(subTask2);
         subTask.setStatus(Status.DONE);
@@ -66,7 +68,7 @@ public class FileBackedTaskManagerTest {
         fileBackedTaskManager.save();
 
         String file = Files.readString(forWriteData);
-        Assertions.assertTrue(file.contains("id,type,name,status,description,epic"));
+        Assertions.assertTrue(file.contains("id,type,name,status,description,[epic/subtasks],duration,start-time"));
         Assertions.assertTrue(file.contains("0,TASK,changed name,IN_PROGRESS,desc"));
         Assertions.assertTrue(file.contains("3,EPIC,Epic2,DONE,desc,[4 5]"));
         Assertions.assertTrue(file.contains("4,SUBTASK,subTaskDone,DONE,desc,3"));

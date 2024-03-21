@@ -23,7 +23,7 @@ public class Epic extends Task {
         return timedSubTask;
     }
 
-
+    /* Перечисляет элементы без запятой, потому что запятая ломает работу метода загрузки из файла */
     public String subtaskIDsToString() {
         final Iterator<Integer> it = subTaskIDs.iterator();
         if (! it.hasNext())

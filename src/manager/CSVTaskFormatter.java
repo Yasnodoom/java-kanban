@@ -8,8 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CSVTaskFormatter {
     static public String toString(Task task) {
@@ -75,21 +76,12 @@ public class CSVTaskFormatter {
     }
 
     public static String historyToString(HistoryManager manager) {
-        List<String> iDs = new ArrayList<>();
-
-        for (Task task : manager.getHistory()) {
-            iDs.add(String.valueOf(task.getId()));
-        }
-        return String.join(",", iDs.toArray(new String[manager.getHistory().size()]));
+        return String.join(",", manager.getHistory().stream()
+                .map(Task::getId).map(String::valueOf).toArray(String[]::new));
     }
 
     public static List<Integer> historyFromString(String value) {
-        List<Integer> hfs = new ArrayList<>();
-
-        for (String split : value.split(",")) {
-            hfs.add(Integer.valueOf(split));
-        }
-        return hfs;
+        return Arrays.stream(value.split(",")).map(Integer::valueOf).collect(Collectors.toList());
     }
 
     public static FileBackedTaskManager loadFromFile(Path file) {

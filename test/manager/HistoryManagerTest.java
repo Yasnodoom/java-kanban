@@ -21,25 +21,27 @@ public class HistoryManagerTest {
     public void setUp() {
         historyManager = Managers.getDefaultHistory();
         taskManager = Managers.getDefault();
-//        tasks = Map.of(
-//                "Task1", new Task("task1", "desc", Duration.ofSeconds(100), LocalDateTime.now()),
-//
-//                        );
+        tasks = Map.of(
+                "Task1", new Task("task1", "desc", Duration.ofSeconds(10), LocalDateTime.now()),
+                "Task2", new Task("task2", "desc", Duration.ofSeconds(10), LocalDateTime.now().plusMinutes(1)),
+                "Task3", new Task("task3", "desc", Duration.ofSeconds(10), LocalDateTime.now().plusMinutes(2))
+        );
     }
 
     @Test
     public void add() {
-        Task task1 = new Task("task1", "desc", Duration.ofSeconds(100), LocalDateTime.now());
-        historyManager.add(task1);
+        historyManager.add(tasks.get("Task1"));
         final List<Task> history = historyManager.getHistory();
-        assertNotNull(history, "История не пустая.");
-        assertEquals(1, history.size(), "История не пустая.");
+
+        assertNotNull(history);
+        assertEquals(1, history.size());
     }
 
     @Test
     public void save12Elements() {
         for (int i = 0; i < 12; i++) {
-            Task task = new Task("task" + i, "desc", Duration.ofSeconds(100), LocalDateTime.now());
+            Task task = new Task("task" + i, "desc", Duration.ofSeconds(10), LocalDateTime.now()
+                    .plus(Duration.ofSeconds(20 * i)));
             taskManager.addTask(task);
             historyManager.add(task);
         }
@@ -50,27 +52,63 @@ public class HistoryManagerTest {
 
     @Test
     public void savePrevisionVersion() {
-        Task task = new Task("task", "desc", Duration.ofSeconds(100), LocalDateTime.now());
-        taskManager.addTask(task);
-        historyManager.add(task);
-        task.setDescription("changed");
-        taskManager.updateTask(task);
-        assertEquals(taskManager.getTaskByID(task.getId()).getDescription(), "changed");
+        taskManager.addTask(tasks.get("Task1"));
+        historyManager.add(tasks.get("Task1"));
+        tasks.get("Task1").setDescription("changed");
+        taskManager.updateTask(tasks.get("Task1"));
+
+        assertEquals(taskManager.getTaskByID(tasks.get("Task1").getId()).getDescription(), "changed");
         assertEquals(historyManager.getHistory().getFirst().getDescription(), "desc");
     }
 
     @Test
     public void saveOneTaskTwoTimesInHistoryManager() {
-        Task firstTask = new Task("firstTask", "firstTask", Duration.ofSeconds(100), LocalDateTime.now());
-        Task secondTask = new Task("secondTask", "secondTask", Duration.ofSeconds(100), LocalDateTime.now());
-        taskManager.addTask(firstTask);
-        taskManager.addTask(secondTask);
-        historyManager.add(firstTask);
-        historyManager.add(secondTask);
+        taskManager.addTask(tasks.get("Task1"));
+        taskManager.addTask(tasks.get("Task2"));
+        historyManager.add(tasks.get("Task1"));
+        historyManager.add(tasks.get("Task2"));
+
         assertEquals(2, historyManager.getHistory().size());
-        historyManager.add(firstTask);
+
+        historyManager.add(tasks.get("Task1"));
+
         assertEquals(2, historyManager.getHistory().size());
-        assertEquals("secondTask", historyManager.getHistory().getFirst().getName());
-        assertEquals("firstTask", historyManager.getHistory().getLast().getName());
+        assertEquals(tasks.get("Task2").getName(), historyManager.getHistory().getFirst().getName());
+        assertEquals(tasks.get("Task1").getName(), historyManager.getHistory().getLast().getName());
+    }
+
+    @Test
+    public void getEmptyHistoryManager() {
+        assertNotNull(historyManager.getHistory());
+        assertEquals(0, historyManager.getHistory().size());
+    }
+
+    @Test
+    public void duplicatedHistoryShouldNotExist() {
+        historyManager.add(tasks.get("Task1"));
+        historyManager.add(tasks.get("Task1"));
+        historyManager.add(tasks.get("Task1"));
+        assertEquals(1, historyManager.getHistory().size());
+    }
+
+    @Test
+    public void removeFromHistory() {
+        taskManager.addTask(tasks.get("Task1"));
+        taskManager.addTask(tasks.get("Task2"));
+        taskManager.addTask(tasks.get("Task3"));
+
+        historyManager.add(tasks.get("Task1"));
+        historyManager.add(tasks.get("Task2"));
+        historyManager.add(tasks.get("Task3"));
+        assertEquals(3, historyManager.getHistory().size());
+
+        historyManager.remove(tasks.get("Task2").getId());
+        assertEquals(2, historyManager.getHistory().size());
+
+        historyManager.remove(tasks.get("Task1").getId());
+        assertEquals(1, historyManager.getHistory().size());
+
+        historyManager.remove(tasks.get("Task3").getId());
+        assertEquals(0, historyManager.getHistory().size());
     }
 }
