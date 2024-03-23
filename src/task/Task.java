@@ -1,18 +1,24 @@
 package task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class Task implements Cloneable {
+public class Task implements Cloneable, Comparable<Task> {
     private Integer id;
     private String name;
     private String description;
     private Status status;
+    private Duration duration;
+    private LocalDateTime startTime;
 
-    public Task(String name, String description) {
+    public Task(String name, String description, Duration duration, LocalDateTime startTime) {
+        this.id = 0;
         this.name = name;
         this.description = description;
-        this.id = 0;
         this.status = Status.NEW;
+        this.duration = duration;
+        this.startTime = startTime;
     }
 
     public Integer getId() {
@@ -31,6 +37,14 @@ public class Task implements Cloneable {
         return status;
     }
 
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -45,6 +59,18 @@ public class Task implements Cloneable {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
     }
 
     @Override
@@ -78,5 +104,10 @@ public class Task implements Cloneable {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public int compareTo(Task o) {
+        return this.startTime.compareTo(o.startTime);
     }
 }

@@ -7,12 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class ManagersTest {
 
     @Test
-    void managersReturnNotNullForGetDefault() {
+    public void managersReturnNotNullForGetDefault() {
         assertNotNull(Managers.getDefault());
     }
 
     @Test
-    void managersReturnNotNullForGetDefaultHistory() {
+    public void managersReturnNotNullForGetDefaultHistory() {
         assertNotNull(Managers.getDefaultHistory());
     }
 }
