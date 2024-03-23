@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CSVTaskFormatter {
-    static public String toString(Task task) {
+    public static String toString(Task task) {
         return switch (task.getClass().getName().split("\\.")[1]) {
             case "Task" -> String.format("%d,%S,%s,%s,%s,%d,%s\n",
                     task.getId(), "Task", task.getName(), task.getStatus(), task.getDescription(),
@@ -35,7 +35,7 @@ public class CSVTaskFormatter {
         };
     }
 
-    static public Task fromString(String value) {
+    public static Task fromString(String value) {
         String[] task = value.split(",");
 
         switch (TypeTask.valueOf(task[1])) {
@@ -53,10 +53,10 @@ public class CSVTaskFormatter {
                 epic.setId(Integer.valueOf(task[0]));
                 epic.setStatus(Status.valueOf(task[3]));
                 epic.setDuration(Duration.ofSeconds(Long.parseLong(task[6])));
-                if (! task[7].equals("null"))
+                if (!task[7].equals("null"))
                     epic.setStartTime(LocalDateTime.parse(task[7]));
 
-                if (! task[8].equals("null"))
+                if (!task[8].equals("null"))
                     epic.setEndTime(LocalDateTime.parse(task[8]));
                 return epic;
             }

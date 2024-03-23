@@ -30,11 +30,11 @@ public class InMemoryHistoryManager implements HistoryManager {
         return List.copyOf(linkedHistory.getNodes());
     }
 
-    static class NodeList<T extends Task> {
+    private static class NodeList<T extends Task> {
         private Node<T> head;
         private Node<T> tail;
 
-        public void addLast(T element) {
+        private void addLast(T element) {
             final Node<T> last = tail;
             final Node<T> newLast = new Node<>(element, tail, null);
             tail = newLast;
@@ -45,14 +45,14 @@ public class InMemoryHistoryManager implements HistoryManager {
             }
         }
 
-        public Node<T> getLast() {
+        private Node<T> getLast() {
             final Node<T> last = tail;
             if (last == null)
                 throw new NoSuchElementException();
             return tail;
         }
 
-        public List<T> getNodes() {
+        private List<T> getNodes() {
             ArrayList<T> nodes = new ArrayList<>();
             if (head == null) {
                 return nodes;
@@ -68,7 +68,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             return nodes;
         }
 
-        public void unlinkNode(Node<T> removeNode) {
+        private void unlinkNode(Node<T> removeNode) {
             Node<T> prevNode = removeNode.getPrev();
             Node<T> nextNode = removeNode.getNext();
 

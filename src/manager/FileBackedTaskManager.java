@@ -13,17 +13,17 @@ import java.nio.file.Path;
 import static manager.CSVTaskFormatter.historyToString;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
-    private final Path BACKED_FILE;
+    private final Path backedFile;
 
     public FileBackedTaskManager(Path file) {
-        BACKED_FILE = file;
+        backedFile = file;
     }
 
     public void save() {
         if (this.getTasks().isEmpty() && this.getEpics().isEmpty() && this.getSubTasks().isEmpty())
             return;
 
-        try (Writer fileWriter = new FileWriter(BACKED_FILE.toFile(), false)) {
+        try (Writer fileWriter = new FileWriter(backedFile.toFile(), false)) {
             fileWriter.write("id,type,name,status,description,[epic/subtasks],duration,start-time\n");
             for (Task task : this.getTasks()) {
                 fileWriter.write(CSVTaskFormatter.toString(task));
