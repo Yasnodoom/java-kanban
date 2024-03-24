@@ -1,0 +1,89 @@
+package server.handlers;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import manager.CSVTaskFormatter;
+import manager.FileBackedTaskManager;
+import server.Endpoint;
+import server.adapters.DurationAdapter;
+import server.adapters.LocalDateTimeAdapter;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
+public abstract class ManagerHandler implements HttpHandler {
+    protected Gson gson;
+
+    public ManagerHandler() throws IOException {
+        gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter(Duration.class, new DurationAdapter())
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .create();
+    }
+
+    protected FileBackedTaskManager manager =
+            CSVTaskFormatter.loadFromFile(Files.copy(
+                    Path.of("test", "resources", "withData.csv"),
+                    Files.createTempFile("test", "csv"),
+                    REPLACE_EXISTING));
+
+    protected void writeResponse(HttpExchange exchange,
+                                 String responseString,
+                                 int responseCode) throws IOException {
+        try (OutputStream os = exchange.getResponseBody()) {
+            exchange.sendResponseHeaders(responseCode, 0);
+            os.write(responseString.getBytes(StandardCharsets.UTF_8));
+        }
+    }
+
+    protected Optional<Integer> getId(HttpExchange exchange) {
+        String[] pathParts = exchange.getRequestURI().getPath().split("/");
+
+        try {
+            return Optional.of(Integer.parseInt(pathParts[2]));
+        } catch (NumberFormatException | IndexOutOfBoundsException exception) {
+            return Optional.empty();
+        }
+    }
+
+    protected Endpoint getEndpoint(String requestPath, String requestMethod) {
+        String[] pathParts = requestPath.split("/");
+
+        switch (pathParts[1]) {
+            case "tasks":
+                if (requestMethod.equals("GET")) {
+                    if (pathParts.length == 3)
+                        return Endpoint.GET_TASK_ID;
+                    if (pathParts.length == 2)
+                        return Endpoint.GET_TASKS;
+                }
+                if (requestMethod.equals("POST"))
+                    return Endpoint.POST_TASKS;
+                if (requestMethod.equals("DELETE"))
+                    return Endpoint.DELETE_TASKS;
+                break;
+            case "subtasks":
+                break;
+            case "epics":
+                break;
+            case "history":
+                break;
+            case "prioritized":
+                break;
+            default:
+                break;
+        }
+        return Endpoint.UNKNOWN;
+    }
+}
