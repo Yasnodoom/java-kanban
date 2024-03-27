@@ -24,7 +24,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             return;
 
         try (Writer fileWriter = new FileWriter(backedFile.toFile(), false)) {
-            fileWriter.write("id,type,name,status,description,[epic/subtasks],duration,start-time\n");
+            fileWriter.write("id,type,name,status,description,[epic/subtasks],duration,start-time \n");
             for (Task task : this.getTasks()) {
                 fileWriter.write(CSVTaskFormatter.toString(task));
             }

@@ -8,7 +8,9 @@ import manager.CSVTaskFormatter;
 import manager.FileBackedTaskManager;
 import server.Endpoint;
 import server.adapters.DurationAdapter;
+import server.adapters.EpicAdapter;
 import server.adapters.LocalDateTimeAdapter;
+import task.Epic;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,14 +31,15 @@ public abstract class ManagerHandler implements HttpHandler {
                 .setPrettyPrinting()
                 .registerTypeAdapter(Duration.class, new DurationAdapter())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .registerTypeAdapter(Epic.class, new EpicAdapter())
                 .create();
     }
 
-    protected FileBackedTaskManager manager =
-            CSVTaskFormatter.loadFromFile(Files.copy(
-                    Path.of("test", "resources", "withData.csv"),
-                    Files.createTempFile("test", "csv"),
-                    REPLACE_EXISTING));
+    protected FileBackedTaskManager manager = CSVTaskFormatter.loadFromFile(Files.copy(
+            Path.of("test", "resources", "withData.csv"),
+            Files.createTempFile("test", "csv"),
+            REPLACE_EXISTING)
+    );
 
     protected void writeResponse(HttpExchange exchange,
                                  String responseString,
@@ -74,12 +77,38 @@ public abstract class ManagerHandler implements HttpHandler {
                     return Endpoint.DELETE_TASKS;
                 break;
             case "subtasks":
+                if (requestMethod.equals("GET")) {
+                    if (pathParts.length == 3)
+                        return Endpoint.GET_SUBTASKS_ID;
+                    if (pathParts.length == 2)
+                        return Endpoint.GET_SUBTASKS;
+                }
+                if (requestMethod.equals("POST"))
+                    return Endpoint.POST_SUBTASKS;
+                if (requestMethod.equals("DELETE"))
+                    return Endpoint.DELETE_SUBTASKS;
                 break;
             case "epics":
+                if (requestMethod.equals("GET")) {
+                    if (pathParts.length == 3)
+                        return Endpoint.GET_EPIC_ID;
+                    if (pathParts.length == 2)
+                        return Endpoint.GET_EPICS;
+                }
+                if (requestMethod.equals("POST"))
+                    return Endpoint.POST_EPICS;
+                if (requestMethod.equals("DELETE"))
+                    return Endpoint.DELETE_EPICS;
                 break;
             case "history":
+                if (requestMethod.equals("GET")) {
+                    return Endpoint.GET_HISTORY;
+                }
                 break;
             case "prioritized":
+                if (requestMethod.equals("GET")) {
+                    return Endpoint.GET_PRIORITIZED;
+                }
                 break;
             default:
                 break;

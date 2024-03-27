@@ -18,23 +18,11 @@ public class TaskHandler extends ManagerHandler {
         Endpoint endpoint = getEndpoint(exchange.getRequestURI().getPath(), exchange.getRequestMethod());
 
         switch (endpoint) {
-            case GET_TASKS: {
-                handleGetTasks(exchange);
-                break;
-            }
-            case GET_TASK_ID: {
-                handleGetTaskID(exchange);
-                break;
-            }
-            case POST_TASKS: {
-                handlePostTask(exchange);
-                break;
-            }
-            case DELETE_TASKS:
-                handleDeleteTasks(exchange);
-                break;
-            default:
-                writeResponse(exchange, "Такого эндпоинта не существует", 404);
+            case GET_TASKS -> handleGetTasks(exchange);
+            case GET_TASK_ID -> handleGetTaskID(exchange);
+            case POST_TASKS -> handlePostTask(exchange);
+            case DELETE_TASKS -> handleDeleteTasks(exchange);
+            default -> writeResponse(exchange, "Такого эндпоинта не существует", 404);
         }
     }
 
@@ -51,7 +39,7 @@ public class TaskHandler extends ManagerHandler {
 
         final int taskId = id.get();
         if (manager.getTasks().stream().noneMatch(task -> task.getId() == taskId)) {
-            writeResponse(exchange, "Таск с идентификатором " + taskId + " не найден", 400);
+            writeResponse(exchange, "Таск с идентификатором " + taskId + " не найден", 404);
             return;
         }
         writeResponse(exchange, gson.toJson(manager.getTaskByID(taskId)), 200);
@@ -66,7 +54,7 @@ public class TaskHandler extends ManagerHandler {
 
         final int taskId = id.get();
         if (manager.getTasks().stream().noneMatch(task -> task.getId() == taskId)) {
-            writeResponse(exchange, "Таск с идентификатором " + taskId + " не найден", 400);
+            writeResponse(exchange, "Таск с идентификатором " + taskId + " не найден", 404);
             return;
         }
 
@@ -78,8 +66,13 @@ public class TaskHandler extends ManagerHandler {
     private void handlePostTask(HttpExchange exchange) throws IOException {
         Optional<Integer> id = getId(exchange);
         if (id.isEmpty()) {
-            Task task = new Task("name", "cerate by API", Duration.ZERO, LocalDateTime.now());
-            manager.addTask(task);
+            Task task = new Task("Task", "create by API", Duration.ofMinutes(5), LocalDateTime.now());
+            try {
+                manager.addTask(task);
+            } catch (Exception e) {
+                writeResponse(exchange, e.getMessage(), 500);
+                return;
+            }
             String response = "Создан новый таск! \n" + gson.toJson(task);
             writeResponse(exchange, response, 201);
             return;
@@ -87,7 +80,7 @@ public class TaskHandler extends ManagerHandler {
 
         final int taskId = id.get();
         if (manager.getTasks().stream().noneMatch(task -> task.getId() == taskId)) {
-            writeResponse(exchange, "Таск с идентификатором " + taskId + " не найден", 400);
+            writeResponse(exchange, "Таск с идентификатором " + taskId + " не найден", 404);
             return;
         }
         manager.updateTask(manager.getTaskByID(taskId));

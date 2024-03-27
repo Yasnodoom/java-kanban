@@ -15,19 +15,19 @@ import java.util.stream.Collectors;
 public class CSVTaskFormatter {
     public static String toString(Task task) {
         return switch (task.getClass().getName().split("\\.")[1]) {
-            case "Task" -> String.format("%d,%S,%s,%s,%s,%d,%s\n",
+            case "Task" -> String.format("%d,%S,%s,%s,%s,%d,%s %n",
                     task.getId(), "Task", task.getName(), task.getStatus(), task.getDescription(),
                     task.getDuration().getSeconds(), task.getStartTime());
             case "Epic" -> {
                 Epic epic = (Epic) task;
-                yield String.format("%d,%S,%s,%s,%s,%s,%d,%s,%s\n", epic.getId(), "Epic",
+                yield String.format("%d,%S,%s,%s,%s,%s,%d,%s,%s %n", epic.getId(), "Epic",
                         epic.getName(), epic.getStatus(), epic.getDescription(), epic.subtaskIDsToString(),
                         epic.getDuration().getSeconds(), epic.getStartTime(),
                         epic.getEndTime());
             }
             case "SubTask" -> {
                 SubTask subTask = (SubTask) task;
-                yield String.format("%d,%S,%s,%s,%s,%d,%d,%s\n", subTask.getId(), "SubTask",
+                yield String.format("%d,%S,%s,%s,%s,%d,%d,%s %n", subTask.getId(), "SubTask",
                         subTask.getName(), subTask.getStatus(), subTask.getDescription(), subTask.getEpicID(),
                         subTask.getDuration().getSeconds(), subTask.getStartTime());
             }
@@ -36,7 +36,7 @@ public class CSVTaskFormatter {
     }
 
     public static Task fromString(String value) {
-        String[] task = value.split(",");
+        String[] task = value.trim().split(",");
 
         switch (TypeTask.valueOf(task[1])) {
             case TASK -> {

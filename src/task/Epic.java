@@ -15,7 +15,7 @@ public class Epic extends Task {
         super(name, description, Duration.ZERO, null);
     }
 
-    public ArrayList<Integer> getSubTaskIDs() {
+    public List<Integer> getSubTaskIDs() {
         return subTaskIDs;
     }
 
