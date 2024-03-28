@@ -1,10 +1,13 @@
 package task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class SubTask extends Task {
     private Integer epicID;
 
-    public SubTask(String name, String description, Integer epicID) {
-        super(name, description);
+    public SubTask(String name, String description, Integer epicID, Duration duration, LocalDateTime startTime) {
+        super(name, description, duration, startTime);
         this.epicID = epicID;
     }
 
@@ -13,7 +16,7 @@ public class SubTask extends Task {
     }
 
     public void setEpicID(Integer epicID) {
-        if (this.epicID.equals(epicID)) return;
+        if (this.getId().equals(epicID)) return;
         this.epicID = epicID;
     }
 
