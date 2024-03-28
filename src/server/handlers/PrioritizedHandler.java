@@ -1,13 +1,16 @@
 package server.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
+import manager.TaskManager;
 import server.Endpoint;
 
 import java.io.IOException;
 import java.util.Objects;
 
 public class PrioritizedHandler extends ManagerHandler {
-    public PrioritizedHandler() throws IOException {
+
+    public PrioritizedHandler(TaskManager manager) {
+        super(manager);
     }
 
     @Override

@@ -64,7 +64,7 @@ public abstract class BaseManagerTest<T extends TaskManager> {
     public void errorIfEpicAddLikeSubTaskToHimself() {
         taskManager.addEpic(epics.get(1));
         epics.get(1).setSubTaskID(epics.get(1).getId());
-        assertEquals(epics.get(1).getSubTaskIDs().size(), 0);
+        assertEquals(0, epics.get(1).getSubTaskIDs().size());
     }
 
     @Test
@@ -92,7 +92,7 @@ public abstract class BaseManagerTest<T extends TaskManager> {
         epics.get(2).setId(999);
         taskManager.addEpic(epics.get(2));
         taskManager.updateEpic(epics.get(2));
-        assertEquals(taskManager.getEpics().size(), 2);
+        assertEquals(2, taskManager.getEpics().size());
         assertNull(taskManager.getEpicByID(999));
         assertNotNull(taskManager.getEpicByID(epics.get(1).getId()));
         assertNotNull(taskManager.getEpicByID(epics.get(2).getId()));
@@ -110,7 +110,7 @@ public abstract class BaseManagerTest<T extends TaskManager> {
         taskManager.addSubTask(subTask1);
         taskManager.addSubTask(subTask2);
         taskManager.addSubTask(subTask3);
-        assertEquals(epics.get(1).getStatus(), Status.NEW);
+        assertEquals(Status.NEW, epics.get(1).getStatus());
     }
 
     @Test
@@ -132,7 +132,7 @@ public abstract class BaseManagerTest<T extends TaskManager> {
         taskManager.updateSubTask(subTask2);
         taskManager.updateSubTask(subTask3);
 
-        assertEquals(epics.get(1).getStatus(), Status.DONE);
+        assertEquals(Status.DONE, epics.get(1).getStatus());
     }
 
     @Test
@@ -154,7 +154,7 @@ public abstract class BaseManagerTest<T extends TaskManager> {
         taskManager.updateSubTask(subTask2);
         taskManager.updateSubTask(subTask3);
 
-        assertEquals(epics.get(1).getStatus(), Status.IN_PROGRESS);
+        assertEquals(Status.IN_PROGRESS, epics.get(1).getStatus());
     }
 
     @Test
@@ -176,7 +176,7 @@ public abstract class BaseManagerTest<T extends TaskManager> {
         taskManager.updateSubTask(subTask2);
         taskManager.updateSubTask(subTask3);
 
-        assertEquals(epics.get(1).getStatus(), Status.IN_PROGRESS);
+        assertEquals(Status.IN_PROGRESS, epics.get(1).getStatus());
     }
 
     @Test

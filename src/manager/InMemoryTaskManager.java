@@ -63,7 +63,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Task task) {
         if (isIntersectWithAllTask(task))
-            throw new RuntimeException(String.format(ERROR_MESSAGE, "Update", task.getName()));
+            throw new UnsupportedOperationException(String.format(ERROR_MESSAGE, "Update", task.getName()));
 
         tasks.put(task.getId(), task);
     }
@@ -76,7 +76,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSubTask(SubTask task) {
         if (isIntersectWithAllTask(task))
-            throw new RuntimeException(String.format(ERROR_MESSAGE, "Update subtask", task.getName()));
+            throw new UnsupportedOperationException(String.format(ERROR_MESSAGE, "Update subtask", task.getName()));
 
         subTasks.put(task.getId(), task);
         autoUpdateEpicStatus(task.getEpicID());
@@ -86,7 +86,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addTask(Task task) {
         if (isIntersectWithAllTask(task))
-            throw new RuntimeException(String.format(ERROR_MESSAGE, "Добавление", task.getName()));
+            throw new UnsupportedOperationException(String.format(ERROR_MESSAGE, "Добавление", task.getName()));
 
         task.setId(getNewId());
         tasks.put(task.getId(), task);
@@ -102,7 +102,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addSubTask(SubTask subTask) {
         if (isIntersectWithAllTask(subTask))
-            throw new RuntimeException(String.format(ERROR_MESSAGE, "Добавление сабтаска", subTask.getName()));
+            throw new UnsupportedOperationException(String.format(ERROR_MESSAGE, "Добавление сабтаска", subTask.getName()));
 
         subTask.setId(getNewId());
         epics.get(subTask.getEpicID()).setSubTaskID(subTask.getId());
@@ -240,7 +240,7 @@ public class InMemoryTaskManager implements TaskManager {
                 && left.getEndTime().isBefore(right.getEndTime());
     }
 
-    private Boolean isIntersectWithAllTask(Task task) {
+    private boolean isIntersectWithAllTask(Task task) {
         return getPrioritizedTasks().stream().anyMatch(pTask -> isIntersect(pTask, task));
     }
 

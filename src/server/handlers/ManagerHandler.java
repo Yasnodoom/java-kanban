@@ -4,8 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import manager.CSVTaskFormatter;
-import manager.FileBackedTaskManager;
+import manager.TaskManager;
 import server.Endpoint;
 import server.adapters.DurationAdapter;
 import server.adapters.EpicAdapter;
@@ -15,18 +14,16 @@ import task.Epic;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-
 public abstract class ManagerHandler implements HttpHandler {
     protected Gson gson;
+    protected TaskManager manager;
 
-    public ManagerHandler() throws IOException {
+    protected ManagerHandler(TaskManager manager) {
+        this.manager = manager;
         gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter(Duration.class, new DurationAdapter())
@@ -34,12 +31,6 @@ public abstract class ManagerHandler implements HttpHandler {
                 .registerTypeAdapter(Epic.class, new EpicAdapter())
                 .create();
     }
-
-    protected FileBackedTaskManager manager = CSVTaskFormatter.loadFromFile(Files.copy(
-            Path.of("test", "resources", "withData.csv"),
-            Files.createTempFile("test", "csv"),
-            REPLACE_EXISTING)
-    );
 
     protected void writeResponse(HttpExchange exchange,
                                  String responseString,
@@ -94,6 +85,8 @@ public abstract class ManagerHandler implements HttpHandler {
                         return Endpoint.GET_EPIC_ID;
                     if (pathParts.length == 2)
                         return Endpoint.GET_EPICS;
+                    if (pathParts.length == 4 && pathParts[3].equals("subtasks"))
+                        return Endpoint.GET_EPIC_SUBTASKS;
                 }
                 if (requestMethod.equals("POST"))
                     return Endpoint.POST_EPICS;

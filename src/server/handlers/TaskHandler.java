@@ -1,16 +1,19 @@
 package server.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
+import manager.TaskManager;
 import server.Endpoint;
 import task.Task;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.time.LocalDateTime;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 public class TaskHandler extends ManagerHandler {
-    public TaskHandler() throws IOException {
+
+    public TaskHandler(TaskManager manager) {
+        super(manager);
     }
 
     @Override
@@ -66,15 +69,17 @@ public class TaskHandler extends ManagerHandler {
     private void handlePostTask(HttpExchange exchange) throws IOException {
         Optional<Integer> id = getId(exchange);
         if (id.isEmpty()) {
-            Task task = new Task("Task", "create by API", Duration.ofMinutes(5), LocalDateTime.now());
+            InputStream inputStream = exchange.getRequestBody();
+            String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            Task task = gson.fromJson(body, Task.class);
             try {
                 manager.addTask(task);
             } catch (Exception e) {
                 writeResponse(exchange, e.getMessage(), 500);
                 return;
             }
-            String response = "Создан новый таск! \n" + gson.toJson(task);
-            writeResponse(exchange, response, 201);
+            exchange.sendResponseHeaders(201, 0);
+            exchange.close();
             return;
         }
 

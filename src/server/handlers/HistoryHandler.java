@@ -1,15 +1,16 @@
 package server.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
+import manager.TaskManager;
 import server.Endpoint;
-import task.Task;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class HistoryHandler extends ManagerHandler {
-    public HistoryHandler() throws IOException {
+
+    public HistoryHandler(TaskManager manager) {
+        super(manager);
     }
 
     @Override

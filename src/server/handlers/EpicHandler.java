@@ -1,17 +1,19 @@
 package server.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
+import manager.TaskManager;
 import server.Endpoint;
 import task.Epic;
-import task.Task;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.time.LocalDateTime;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 public class EpicHandler extends ManagerHandler {
-    public EpicHandler() throws IOException {
+
+    public EpicHandler(TaskManager manager) {
+        super(manager);
     }
 
     @Override
@@ -21,6 +23,7 @@ public class EpicHandler extends ManagerHandler {
         switch (endpoint) {
             case GET_EPICS -> handleGetEpics(exchange);
             case GET_EPIC_ID -> handleGetEpicID(exchange);
+            case GET_EPIC_SUBTASKS -> handleGetEpicSubtasks(exchange);
             case POST_EPICS -> handlePostEpic(exchange);
             case DELETE_EPICS -> handleDeleteEpics(exchange);
             default -> writeResponse(exchange, "Такого эндпоинта не существует", 404);
@@ -65,14 +68,32 @@ public class EpicHandler extends ManagerHandler {
     }
 
     private void handlePostEpic(HttpExchange exchange) throws IOException {
-        Epic task = new Epic("Epic", "create by API");
+        InputStream inputStream = exchange.getRequestBody();
+        String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        Epic task = gson.fromJson(body, Epic.class);
         try {
             manager.addEpic(task);
         } catch (Exception e) {
             writeResponse(exchange, e.getMessage(), 500);
             return;
         }
-        String response = "Создан новый 'эпик! \n" + gson.toJson(task);
-        writeResponse(exchange, response, 201);
+        exchange.sendResponseHeaders(201, 0);
+        exchange.close();
     }
+
+    private void handleGetEpicSubtasks(HttpExchange exchange) throws IOException {
+        Optional<Integer> id = getId(exchange);
+        if (id.isEmpty()) {
+            writeResponse(exchange, "Некорректный идентификатор", 400);
+            return;
+        }
+
+        final int taskId = id.get();
+        if (manager.getEpics().stream().noneMatch(task -> task.getId() == taskId)) {
+            writeResponse(exchange, "Таск с идентификатором " + taskId + " не найден", 404);
+            return;
+        }
+        writeResponse(exchange, manager.getEpicByID(taskId).getSubTaskIDs().toString(), 200);
+    }
+
 }

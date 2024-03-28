@@ -79,10 +79,10 @@ public class FileBackedTaskManagerFilesTest {
     public void backManagerLoadFromFile() {
         FileBackedTaskManager fileBackedTaskManager = CSVTaskFormatter.loadFromFile(withData);
         assertNotNull(fileBackedTaskManager);
-        assertEquals(fileBackedTaskManager.getHistory().size(), 3);
-        assertEquals(fileBackedTaskManager.getTaskByID(0).getName(), "changed name");
-        assertEquals(fileBackedTaskManager.getEpicByID(3).getStatus(), Status.DONE);
-        assertEquals(fileBackedTaskManager.getSubTaskByID(4).getEpicID(), 3);
+        assertEquals(3, fileBackedTaskManager.getHistory().size());
+        assertEquals("changed name", fileBackedTaskManager.getTaskByID(0).getName());
+        assertEquals(Status.DONE, fileBackedTaskManager.getEpicByID(3).getStatus());
+        assertEquals(3, fileBackedTaskManager.getSubTaskByID(4).getEpicID());
     }
 
     @Test

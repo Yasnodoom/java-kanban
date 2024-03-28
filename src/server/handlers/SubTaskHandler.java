@@ -1,13 +1,19 @@
 package server.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
+import manager.TaskManager;
 import server.Endpoint;
+import task.SubTask;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 public class SubTaskHandler extends ManagerHandler {
-    public SubTaskHandler() throws IOException {
+
+    public SubTaskHandler(TaskManager manager) {
+        super(manager);
     }
 
     @Override
@@ -63,8 +69,17 @@ public class SubTaskHandler extends ManagerHandler {
     private void handlePostTask(HttpExchange exchange) throws IOException {
         Optional<Integer> id = getId(exchange);
         if (id.isEmpty()) {
-            String response = "Отсутствует epic id";
-            writeResponse(exchange, response, 404);
+            InputStream inputStream = exchange.getRequestBody();
+            String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            SubTask task = gson.fromJson(body, SubTask.class);
+            try {
+                manager.addSubTask(task);
+            } catch (Exception e) {
+                writeResponse(exchange, e.getMessage(), 500);
+                return;
+            }
+            exchange.sendResponseHeaders(201, 0);
+            exchange.close();
             return;
         }
 
